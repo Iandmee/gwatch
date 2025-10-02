@@ -23,7 +23,7 @@ You can obtain it manually by running:
 ```
 -h [ --help ]         Show help message 
 --var arg             Variable name 
---exec arg            Executable path
+--exec arg            Full executable path
 
 ('-- arg1 arg2 ... argn' to pass n arguments to executable)
 Example:

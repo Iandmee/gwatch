@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     desc.add_options()
             ("help,h", po::bool_switch(&help), "Show help message")
             ("var", po::value(&variableName), "Variable name")
-            ("exec", po::value(&exec), "Executable path");
+            ("exec", po::value(&exec), "Full executable path");
     p.add("exec", -1);
     try {
         po::variables_map vm;
