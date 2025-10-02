@@ -51,6 +51,7 @@ public:
         if (!skipToMain()) {
             return 1;
         }
+
         errno = 0;
         long last_val = ptrace(PTRACE_PEEKDATA, pid, reinterpret_cast<void *>(runtimeVariable.address), nullptr);
         if (errno) {
@@ -59,7 +60,13 @@ public:
         }
         std::cout << "Initial value at 0x" << std::hex << runtimeVariable.address
                   << " = 0x" << last_val << std::dec << "\n";
-        
+
+        // Trying to set watchpoints here, unfortunately does not work in Docker alpine/ARM :(
+        if (!set_watchpoint() || !check_watchpoint()) {
+            return 1;
+        }
+
+        // Continue with a simple approach = step and check;
         while (true) {
             // Single step the child process
             if (ptrace(PTRACE_SINGLESTEP, pid, nullptr, nullptr) == -1) {
