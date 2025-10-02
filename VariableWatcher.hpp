@@ -66,8 +66,15 @@ public:
             return 1;
         }
 
-        // Continue with a simple approach = step and check;
+        // Continue with a simple approach = step and check, with max 1e5 steps.
+        int stepsCount = 0;
         while (true) {
+
+            if (++stepsCount == MAX_STEPS) {
+                ptrace(PTRACE_CONT, pid, nullptr, nullptr);
+                return 0;
+            }
+
             // Single step the child process
             if (ptrace(PTRACE_SINGLESTEP, pid, nullptr, nullptr) == -1) {
                 perror("PTRACE_SINGLESTEP");
@@ -128,6 +135,18 @@ private:
             uint32_t pad;
         } dbg_regs[16];
     };
+
+    struct RuntimeGlobalVariable {
+        uint64_t address;
+        size_t size;
+    };
+
+    const int MAX_STEPS = 1e5;
+    pid_t pid;
+    std::string path;
+    std::string variableName;
+    RuntimeGlobalVariable runtimeVariable;
+    uintptr_t runtimeMainAddr;
 
     bool skipToMain() const {
         int status;
@@ -228,7 +247,6 @@ private:
         return true;
     }
 
-
     /**
      * Try to set watchpoint for the runtime global variable address by setting ARM dbg registers
      * @return success or not
@@ -280,18 +298,6 @@ private:
         std::cout << "Watchpoint set successfully\n";
         return true;
     }
-
-
-    struct RuntimeGlobalVariable {
-        uint64_t address;
-        size_t size;
-    };
-
-    pid_t pid;
-    std::string path;
-    std::string variableName;
-    RuntimeGlobalVariable runtimeVariable;
-    uintptr_t runtimeMainAddr;
 
     /**
      * Get shift to calculate runtime variable addr
@@ -374,9 +380,9 @@ private:
         if (name != "main") {
             throw std::runtime_error("Could not find main() in symbol table");
         }
+        std::cout << "Main function address: " << std::hex << mainOffset << "\n";
         return mainOffset;
     }
-
 
     /**
      * Execute command in the pipe and return the result.
