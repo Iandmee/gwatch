@@ -11,7 +11,7 @@ The best way to run this application is to use Docker.
 ```
 ### Run
 ```bash
-  docker run --rm gwatch-runner ./gwatch --var variable --exec /gwatch/build/TestAppVariableAccess
+  docker run --rm gwatch-runner ./gwatch --var variable --exec /gwatch/build/TestAppVariableAccess 2>&1
 ```
 
 ## gwatch manual
